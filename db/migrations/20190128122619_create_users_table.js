@@ -1,14 +1,14 @@
-exports.up = function(connection, Promise) {
-  return connection.schema.createTable("users", usersTable => {
+exports.up = function (connection, Promise) {
+  return connection.schema.createTable('users', (usersTable) => {
     usersTable
-      .string("username")
+      .string('username')
       .primary()
       .unique();
-    usersTable.string("name").notNullable();
-    usersTable.string("avatar_url").notNullable();
+    usersTable.string('name').notNullable();
+    usersTable.string('avatar_url').notNullable();
   });
 };
 
-exports.down = function(connection, Promise) {
-  return connection.schema.dropTable("users");
+exports.down = function (connection, Promise) {
+  return connection.schema.dropTable('users');
 };

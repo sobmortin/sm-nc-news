@@ -1,11 +1,9 @@
-exports.up = (connection, Promise) => {
-  console.log("creating topics table");
-  return connection.schema.createTable("topics", topicsTable => {
-    topicsTable.string("slug").primary();
-    topicsTable.string("description").notNullable();
-  });
-};
+exports.up = (connection, Promise) => connection.schema.createTable('topics', (topicsTable) => {
+  topicsTable
+    .string('slug')
+    .primary()
+    .unique();
+  topicsTable.string('description').notNullable();
+});
 
-exports.down = (connection, Promise) => {
-  return connection.schema.dropTable("topics");
-};
+exports.down = (connection, Promise) => connection.schema.dropTable('topics');
