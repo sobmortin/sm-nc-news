@@ -8,32 +8,26 @@ exports.addTopics = body => connection('topics')
 
 exports.fetchArticlesByTopic = (
   param,
-  { limit = 10, sort_by = 'created_at', order_by = 'desc' },
-) => {
-  // console.log(limit);
-  return connection
-    .select('topic', 'created_by as author', 'title', 'article_id', 'votes', 'created_at')
-    .from('articles')
-    .limit(limit)
-    .orderBy(sort_by, order_by)
-    .where('topic', '=', param);
-};
+  {
+    limit = 10, sort_by = 'created_at', order_by = 'desc', p = 1,
+  },
+) => connection
+  .select(
+    'articles.topic',
+    'articles.article_id',
+    'articles.title',
+    'articles.created_by AS author',
+    'articles.votes',
+    'articles.created_at',
+  )
+  .count('comments.article_id AS comment_count')
+  .from('articles')
+  .leftJoin('comments', 'articles.article_id', '=', 'comments.article_id')
+  .groupBy('articles.article_id')
+  .limit(limit)
+  .orderBy(sort_by, order_by)
+  .where('topic', '=', param);
 
-// KNEX LEFT JOIN TEMPLATE
-// connection
-//   .select('parties.party, parties.founded')
-//   .count('mps.mp_id as mp_count ')
-//   .leftJoin('mps, parties.party', '=', 'mps.party')
-//   .from('parties')
-//   .limit('limit')
-//   .groupBy('parties.party')
-//   .orderBy();
-
-// 'created_by as author',
-//   'title',
-//   'article_id',
-//   'votes',
-//   'comment_count',
-//   'created_at',
-//   'topic'
-// .leftJoin('comments', 'comments.belongs_to', '=', 'articles.title')
+exports.countArticlesByTopic = topic => connection('articles')
+  .count('* as total_count')
+  .where('topic', '=', topic);

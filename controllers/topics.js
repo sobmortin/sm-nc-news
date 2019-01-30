@@ -1,4 +1,9 @@
-const { fetchTopics, addTopics, fetchArticlesByTopic } = require('../db/models/topics');
+const {
+  fetchTopics,
+  addTopics,
+  fetchArticlesByTopic,
+  countArticlesByTopic,
+} = require('../db/models/topics');
 
 const getTopics = (req, res, next) => fetchTopics()
   .then((topics) => {
@@ -16,12 +21,17 @@ const postTopics = (req, res, next) => {
 
 const getArticlesByTopic = (req, res, next) => {
   const topicParam = req.params.topic;
-  const queriesObject = req.query;
-  fetchArticlesByTopic(topicParam, queriesObject)
-    .then((articles) => {
-      const total_count = articles.length;
-      if (!total_count) next({ status: 404, message: 'no articles found' });
-      else res.status(200).send({ total_count, articles });
+  let queriesObject = req.query;
+  if (typeof +req.query.limit === 'string') queriesObject = { limit: 10 };
+  return Promise.all([
+    fetchArticlesByTopic(topicParam, queriesObject),
+    countArticlesByTopic(topicParam),
+  ])
+    .then(([articles, total_count]) => {
+      const total_articles = total_count[0].total_count;
+      if (+total_articles === 0) {
+        next({ status: 404, message: 'no articles found' });
+      } else res.status(200).send({ total_articles, articles });
     })
     .catch(next);
 };
