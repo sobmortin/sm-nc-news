@@ -16,7 +16,7 @@ exports.fetchArticlesByTopic = (
     'articles.topic',
     'articles.article_id',
     'articles.title',
-    'articles.created_by AS author',
+    'articles.username AS author',
     'articles.votes',
     'articles.created_at',
   )
@@ -24,6 +24,7 @@ exports.fetchArticlesByTopic = (
   .from('articles')
   .leftJoin('comments', 'articles.article_id', '=', 'comments.article_id')
   .groupBy('articles.article_id')
+  .offset(limit * (p - 1))
   .limit(limit)
   .orderBy(sort_by, order_by)
   .where('topic', '=', param);
@@ -31,3 +32,7 @@ exports.fetchArticlesByTopic = (
 exports.countArticlesByTopic = topic => connection('articles')
   .count('* as total_count')
   .where('topic', '=', topic);
+
+exports.addArticleByTopic = body => connection('articles')
+  .insert(body)
+  .returning('*');

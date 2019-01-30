@@ -1,9 +1,10 @@
 // formatDateStamps  takes  array of objects and converts js timestamp to readable date
 
-exports.formatDateStamps = data => data.map((article) => {
+exports.formatDateStamps = data => data.map(({ created_by, ...article }) => {
   const formattedArticle = {
     ...article,
-    created_at: new Date(article.created_at).toDateString(),
+    username: created_by,
+    created_at: new Date(article.created_at),
   };
   return formattedArticle;
 });

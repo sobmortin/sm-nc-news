@@ -8,6 +8,7 @@ exports.handle400 = (err, req, res, next) => {
   const codes = {
     42703: 'bad syntax in post request',
     23505: 'breaking unique limitations',
+    23503: 'key is not present in table',
   };
   if (codes.hasOwnProperty(code)) res.status(400).send({ message: codes[code] });
   else next(err);

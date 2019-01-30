@@ -144,5 +144,98 @@ describe('/api', () => {
         expect(body.articles[0].created_at < body.articles[1].created_at).to.equal(true);
         expect(body.articles[2].created_at < body.articles[3].created_at).to.equal(true);
       }));
+    it('GET /:topic/articles should have pagination ability', () => request
+      .get('/api/topics/mitch/articles?p=2')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).to.have.length(1);
+      }));
+    it('GET /:topic/articles should have pagination ability and change with limit query', () => request
+      .get('/api/topics/mitch/articles?p=2&limit=5')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).to.have.length(5);
+      }));
+    it('POST /::topic/articles 201 status and returns posted article object', () => {
+      const article = { title: 'code', body: 'is hard', username: 'rogersop' };
+      return request
+        .post('/api/topics/mitch/articles')
+        .send(article)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.article[0]).to.contain.keys(
+            'article_id',
+            'title',
+            'body',
+            'votes',
+            'topic',
+            'username',
+            'created_at',
+          );
+          expect(body.article).to.be.an('array');
+        });
+    });
+    it('POST /::topic/articles 400 Bad Request status', () => {
+      const article = { title: 'code', body: 'is hard', username: 'seb' };
+      return request
+        .post('/api/topics/mitch/articles')
+        .send(article)
+        .expect(400)
+        .then(({ text }) => {
+          const { message } = JSON.parse(text);
+          expect(message).to.equal('key is not present in table');
+        });
+    });
+  });
+  describe.only('/articles', () => {
+    it('GET / status:200 return an object with articles array of topic objects', () => request
+      .get('/api/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).to.be.an('array');
+        expect(body.articles[0]).to.contain.keys(
+          'article_id',
+          'title',
+          'body',
+          'votes',
+          'topic',
+          'author',
+          'created_at',
+          'comment_count',
+        );
+      }));
+    it('GET / status:200 return an array of length 10 - DEFAULT', () => request
+      .get('/api/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).to.have.length(10);
+      }));
+    it('GET / status:200 return an object with key of total count of articles', () => request
+      .get('/api/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.total_count).to.equal(12);
+      }));
+    it('GET / status:200 to be sorted by date, descending - DEFAULT', () => request
+      .get('/api/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles[0].created_at > body.articles[1].created_at).to.equal(true);
+        expect(body.articles[1].created_at > body.articles[2].created_at).to.equal(true);
+      }));
+    it('GET status:200 to be sorted by date, order=asc', () => request
+      .get('/api/articles?order_by=asc')
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body)
+        expect(body.articles[0].created_at < body.articles[1].created_at).to.equal(true);
+        expect(body.articles[2].created_at < body.articles[3].created_at).to.equal(true);
+      }));
+    it('GET / status:200 returns article object with ID paramater', () => request
+      .get('/api/articles/3')
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body);
+      }));
   });
 });

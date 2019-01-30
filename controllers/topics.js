@@ -3,6 +3,7 @@ const {
   addTopics,
   fetchArticlesByTopic,
   countArticlesByTopic,
+  addArticleByTopic,
 } = require('../db/models/topics');
 
 const getTopics = (req, res, next) => fetchTopics()
@@ -36,4 +37,17 @@ const getArticlesByTopic = (req, res, next) => {
     .catch(next);
 };
 
-module.exports = { getTopics, postTopics, getArticlesByTopic };
+const postArticleByTopic = (req, res, next) => {
+  addArticleByTopic(req.body)
+    .then((article) => {
+      res.status(201).send({ article });
+    })
+    .catch(next);
+};
+
+module.exports = {
+  getTopics,
+  postTopics,
+  getArticlesByTopic,
+  postArticleByTopic,
+};

@@ -12,7 +12,7 @@ exports.up = function (connection, Promise) {
 
     articlesTable.string('topic').references('topics.slug');
 
-    articlesTable.string('created_by').references('users.username');
+    articlesTable.string('username').references('users.username');
 
     articlesTable.timestamp('created_at').defaultTo(connection.fn.now());
   });
