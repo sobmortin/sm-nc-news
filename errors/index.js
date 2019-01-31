@@ -4,6 +4,7 @@ exports.handle404 = (err, req, res, next) => {
 };
 
 exports.handle400 = (err, req, res, next) => {
+  console.log(err);
   const { code } = err;
   const codes = {
     42703: 'bad syntax in post request',

@@ -4,6 +4,12 @@ const {
   fetchArticleById,
   voteUpArticleByID,
   voteDownArticleByID,
+  removeArticleByID,
+  fetchCommentByArticleID,
+  addCommentToArticleID,
+  voteUpCommentByID,
+  voteDownCommentByID,
+  removeCommentByID,
 } = require('../db/models/articles');
 
 const getArticles = (req, res, next) => {
@@ -34,23 +40,77 @@ const patchArticleByID = (req, res, next) => {
   const { article_id } = req.params;
   if (+inc_votes > 0) {
     return voteUpArticleByID(article_id, 1).then(([votedArticle]) => {
-      res.status(202).send({ votedArticle });
+      res.status(200).send({ votedArticle });
     });
   }
   if (+inc_votes < 0) {
     return voteDownArticleByID(article_id, 1).then(([votedArticle]) => {
-      res.status(202).send({ votedArticle });
+      res.status(200).send({ votedArticle });
     });
   }
   next({ status: 400, code: '22P02' });
 };
-//
-//   return fetchArticleById(article_id, queriesObject)
-//     .then((article) => {
-//       updateArticleByID(article, inc_votes);
-//     })
-//     .then(response => console.log('response:', response))
-//     .catch(next);
-// };
 
-module.exports = { getArticles, getArticleByID, patchArticleByID };
+const deleteArticleByID = (req, res, next) => {
+  const { article_id } = req.params;
+  removeArticleByID(article_id)
+    .then(() => res.status(204).send({ message: 'no content' }))
+    .catch(next);
+};
+
+const getCommentByArticleID = (req, res, next) => {
+  const { article_id } = req.params;
+  const queriesObject = req.query;
+  return fetchCommentByArticleID(article_id, queriesObject)
+    .then(comments => res.status(200).send({ comments }))
+    .catch(next);
+};
+
+const postCommentToArticleID = (req, res, next) => {
+  addCommentToArticleID(req.body)
+    .then(([comment]) => {
+      res.status(201).send({ comment });
+    })
+    .catch(next);
+};
+
+const patchCommentVote = (req, res, next) => {
+  const { inc_votes } = req.body;
+  const { comment_id } = req.params;
+  const { article_id } = req.params;
+  if (+inc_votes > 0) {
+    return voteUpCommentByID(+comment_id, +article_id)
+      .then(([votedComment]) => {
+        res.status(200).send({ votedComment });
+      })
+      .catch(next);
+  }
+  if (+inc_votes < 0) {
+    return voteDownCommentByID(comment_id, article_id)
+      .then(([votedComment]) => {
+        res.status(200).send({ votedComment });
+      })
+      .catch(next);
+  }
+  next({ status: 400, code: '22P02' });
+};
+
+const deleteCommentById = (req, res, next) => {
+  console.log(req.params);
+  const { article_id } = req.params;
+  const { comment_id } = req.params;
+  removeCommentByID(article_id, comment_id).then(response => console.log(response));
+  // res.status(204).send({ message: 'no content' }))
+  // .catch(next);
+};
+
+module.exports = {
+  getArticles,
+  getArticleByID,
+  patchArticleByID,
+  deleteArticleByID,
+  getCommentByArticleID,
+  postCommentToArticleID,
+  patchCommentVote,
+  deleteCommentById,
+};

@@ -250,14 +250,14 @@ describe('/api', () => {
       }));
     it('PATCH should update the correct articles votes, id = 1', () => request
       .patch('/api/articles/1')
-      .expect(202)
+      .expect(200)
       .send({ inc_votes: 1 })
       .then(({ body }) => {
         expect(body.votedArticle.votes).to.equal(101);
       }));
     it('PATCH should update the correct articles votes, id = 2', () => request
       .patch('/api/articles/2')
-      .expect(202)
+      .expect(200)
       .send({ inc_votes: 1 })
       .then(({ body }) => {
         expect(body.votedArticle.article_id).to.equal(2);
@@ -265,32 +265,176 @@ describe('/api', () => {
       }));
     it('PATCH should be able to decrement also, id = 1', () => request
       .patch('/api/articles/1')
-      .expect(202)
+      .expect(200)
       .send({ inc_votes: -1 })
       .then(({ body }) => {
         expect(body.votedArticle.votes).to.equal(99);
       }));
     it('PATCH should be able to decrement also, id = 2', () => request
       .patch('/api/articles/2')
-      .expect(202)
+      .expect(200)
       .send({ inc_votes: -1 })
       .then(({ body }) => {
         expect(body.votedArticle.votes).to.equal(-1);
       }));
     it('PATCH should be able to decrement also, id = 3', () => request
       .patch('/api/articles/3')
-      .expect(202)
+      .expect(200)
       .send({ inc_votes: -1 })
       .then(({ body }) => {
         expect(body.votedArticle.votes).to.equal(-1);
       }));
-    it('PATCH should return error when passed incorrect type to vote', () => request
+    it('PATCH 400 error when passed incorrect type to vote', () => request
       .patch('/api/articles/3')
       .expect(400)
       .send({ inc_votes: 'rabbit' })
       .then(({ body }) => {
-        console.log('in test:', body);
         expect(body.message).to.equal('invalid input syntax');
+      }));
+    it('DELETE status:204, returns no content', () => request.delete('/api/articles/1').expect(204));
+    it('DELETE status:400, when passed non exisitng article ', () => request.delete('/api/articles/rabbit').expect(400));
+  });
+  describe('articles/:article_id/comments', () => {
+    it('GET /:article_id/comments 200, returns array of comment objects', () => request
+      .get('/api/articles/1/comments')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).to.be.an('array');
+        expect(body.comments[0]).to.contain.keys(
+          'comment_id',
+          'votes',
+          'created_at',
+          'author',
+          'body',
+        );
+      }));
+    it('GET / status:200 default length of 10', () => request
+      .get('/api/articles/1/comments')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).to.have.length(10);
+      }));
+    it('GET status:200 should return sorted by DEFAULT - date', () => request
+      .get('/api/articles/1/comments')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments[0].created_at > body.comments[1].created_at).to.equal(true);
+        expect(body.comments[2].created_at > body.comments[3].created_at).to.equal(true);
+      }));
+    it('GET status:200 should return sorted by DEFAULT - date, order=asc', () => request
+      .get('/api/articles/1/comments?order_by=asc')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments[0].created_at < body.comments[1].created_at).to.equal(true);
+        expect(body.comments[2].created_at < body.comments[3].created_at).to.equal(true);
+      }));
+    it('GET status:200 should have pagination ability', () => request
+      .get('/api/articles/1/comments?p=2')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).to.have.length(3);
+      }));
+    it('GET status:200 should have pagination ability and change with limit query', () => request
+      .get('/api/articles/1/comments?p=2&limit=5')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).to.have.length(5);
+      }));
+    it('POST status:201 returns added comment object', () => {
+      const comment = { username: 'rogersop', body: 'wow, just amazing, just awful' };
+      return request
+        .post('/api/articles/1/comments')
+        .send(comment)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.comment).to.be.an('object');
+          expect(body.comment).to.contain.keys(
+            'comment_id',
+            'votes',
+            'created_at',
+            'username',
+            'body',
+          );
+        });
+    });
+    it('POST /topic should return a 400 error when malformed syntax', () => {
+      const comment2 = { nonexistent: 'an empty string', username: 'animal' };
+      return request
+        .post('/api/articles/1/comments')
+        .send(comment2)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).to.equal('bad syntax in post request');
+        });
+    });
+  });
+  describe('/articles/:article_id/comments/:comment_id', () => {
+    it('PATCH should update the correct articles votes', () => request
+      .patch('/api/articles/1/comments/2')
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.votedComment.article_id).to.equal(1);
+        expect(body.votedComment.votes).to.equal(15);
+      }));
+    it('PATCH status:404 error if article and comments do not match', () => request
+      .patch('/api/articles/32786/comments/2')
+      .send({ inc_votes: 1 })
+      .expect(404));
+    it('PATCH should be able to decrement also, id = 1', () => request
+      .patch('/api/articles/9/comments/1')
+      .send({ inc_votes: -1 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.votedComment.article_id).to.equal(9);
+        expect(body.votedComment.votes).to.equal(15);
+      }));
+    it('PATCH status:404 error if article and comments do not match', () => request
+      .patch('/api/articles/32786/comments/2')
+      .send({ inc_votes: -1 })
+      .expect(404));
+    xit('DELETE status:204 returns no content', () => request
+      .delete('/api/articles/1/comments/2')
+      .expect(204)
+      .then((res) => {}));
+  });
+  describe('/users', () => {
+    it('GET status:200 returns an array of user objects', () => request
+      .get('/api/users')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users).to.be.an('array');
+        expect(body.users[0]).to.contain.keys('username', 'avatar_url', 'name');
+      }));
+    it('GET status:200 returns user object by ID', () => request
+      .get('/api/users/butter_bridge')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.user.username).to.equal('butter_bridge');
+        expect(body.user).to.have.all.keys('username', 'name', 'avatar_url');
+      }));
+    it('GET status:404 user not found', () => request.get('/api/users/bloodytrain').expect(404));
+    it('GET status:200 returns an object with count and article keys', () => request
+      .get('/api/users/rogersop/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).to.be.an('object');
+        expect(body).to.contain.keys('total_articles', 'articles');
+      }));
+    it('GET / status:200 return an object with articles array of article objects', () => request
+      .get('/api/users/rogersop/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).to.be.an('array');
+        expect(body.articles[0]).to.contain.keys(
+          'article_id',
+          'title',
+          'votes',
+          'topic',
+          'author',
+          'created_at',
+          'comment_count',
+        );
       }));
   });
 });
