@@ -187,7 +187,7 @@ describe('/api', () => {
         });
     });
   });
-  describe.only('/articles', () => {
+  describe('/articles', () => {
     it('GET / status:200 return an object with articles array of topic objects', () => request
       .get('/api/articles')
       .expect(200)
@@ -227,15 +227,70 @@ describe('/api', () => {
       .get('/api/articles?order_by=asc')
       .expect(200)
       .then(({ body }) => {
-        console.log(body)
         expect(body.articles[0].created_at < body.articles[1].created_at).to.equal(true);
         expect(body.articles[2].created_at < body.articles[3].created_at).to.equal(true);
       }));
     it('GET / status:200 returns article object with ID paramater', () => request
-      .get('/api/articles/3')
+      .get('/api/articles/1')
       .expect(200)
       .then(({ body }) => {
-        console.log(body);
+        expect(body.article.article_id).to.equal(1);
+      }));
+    it('GET / status:200 returns article object with ID paramater', () => request
+      .get('/api/articles/2')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article.article_id).to.equal(2);
+      }));
+    it('GET / status:400 returns error message', () => request
+      .get('/api/articles/noID')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).to.equal('invalid input syntax');
+      }));
+    it('PATCH should update the correct articles votes, id = 1', () => request
+      .patch('/api/articles/1')
+      .expect(202)
+      .send({ inc_votes: 1 })
+      .then(({ body }) => {
+        expect(body.votedArticle.votes).to.equal(101);
+      }));
+    it('PATCH should update the correct articles votes, id = 2', () => request
+      .patch('/api/articles/2')
+      .expect(202)
+      .send({ inc_votes: 1 })
+      .then(({ body }) => {
+        expect(body.votedArticle.article_id).to.equal(2);
+        expect(body.votedArticle.votes).to.equal(1);
+      }));
+    it('PATCH should be able to decrement also, id = 1', () => request
+      .patch('/api/articles/1')
+      .expect(202)
+      .send({ inc_votes: -1 })
+      .then(({ body }) => {
+        expect(body.votedArticle.votes).to.equal(99);
+      }));
+    it('PATCH should be able to decrement also, id = 2', () => request
+      .patch('/api/articles/2')
+      .expect(202)
+      .send({ inc_votes: -1 })
+      .then(({ body }) => {
+        expect(body.votedArticle.votes).to.equal(-1);
+      }));
+    it('PATCH should be able to decrement also, id = 3', () => request
+      .patch('/api/articles/3')
+      .expect(202)
+      .send({ inc_votes: -1 })
+      .then(({ body }) => {
+        expect(body.votedArticle.votes).to.equal(-1);
+      }));
+    it('PATCH should return error when passed incorrect type to vote', () => request
+      .patch('/api/articles/3')
+      .expect(400)
+      .send({ inc_votes: 'rabbit' })
+      .then(({ body }) => {
+        console.log('in test:', body);
+        expect(body.message).to.equal('invalid input syntax');
       }));
   });
 });
