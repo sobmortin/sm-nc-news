@@ -24,9 +24,9 @@ const getUserByUsername = (req, res, next) => {
 const getArticlesByUser = (req, res, next) => {
   const { username } = req.params;
   const queriesObj = req.query;
-  console.log(queriesObj);
-  return Promise.all([fetchArticlesByUser(username), countArticlesByUser(username, queriesObj)])
+  return Promise.all([fetchArticlesByUser(username, queriesObj), countArticlesByUser(username)])
     .then(([articles, article_count]) => {
+      if (articles.length === 0) return next({ status: 404, message: 'no articles found' });
       const total_articles = article_count[0].count;
       return res.status(200).send({ total_articles, articles });
     })

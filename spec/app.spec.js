@@ -124,8 +124,8 @@ describe('/api', () => {
       .then(({ body }) => {
         expect(body.articles.length).to.equal(5);
       }));
-    xit('GET status:200 defaults when passed invalid limit', () => request
-      .get('/api/topics/mitch/articles?limit=false')
+    it('GET status:200 defaults when passed invalid limit', () => request
+      .get('/api/topics/mitch/articles?limit=chicken')
       .expect(200)
       .then(({ body }) => {
         expect(body.articles.length).to.equal(10);
@@ -143,6 +143,19 @@ describe('/api', () => {
       .then(({ body }) => {
         expect(body.articles[0].created_at < body.articles[1].created_at).to.equal(true);
         expect(body.articles[2].created_at < body.articles[3].created_at).to.equal(true);
+      }));
+    it('GET /:topic/articles status:200 DEFAULTs when passed bad syntax - date, order=trainman', () => request
+      .get('/api/topics/mitch/articles?order_by=trainman')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles[0].created_at < body.articles[1].created_at).to.equal(true);
+        expect(body.articles[2].created_at < body.articles[3].created_at).to.equal(true);
+      }));
+    it('GET /:topic/articles should have pagination ability', () => request
+      .get('/api/topics/mitch/articles?p=2')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).to.have.length(1);
       }));
     it('GET /:topic/articles should have pagination ability', () => request
       .get('/api/topics/mitch/articles?p=2')
@@ -204,17 +217,17 @@ describe('/api', () => {
           'comment_count',
         );
       }));
-    it('GET / status:200 return an array of length 10 - DEFAULT', () => request
-      .get('/api/articles')
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.articles).to.have.length(10);
-      }));
     it('GET / status:200 return an object with key of total count of articles', () => request
       .get('/api/articles')
       .expect(200)
       .then(({ body }) => {
         expect(body.total_count).to.equal(12);
+      }));
+    it('GET / status:200 return an array of length 10 - DEFAULT', () => request
+      .get('/api/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).to.have.length(10);
       }));
     it('GET / status:200 to be sorted by date, descending - DEFAULT', () => request
       .get('/api/articles')
@@ -393,10 +406,7 @@ describe('/api', () => {
       .patch('/api/articles/32786/comments/2')
       .send({ inc_votes: -1 })
       .expect(404));
-    xit('DELETE status:204 returns no content', () => request
-      .delete('/api/articles/1/comments/2')
-      .expect(204)
-      .then((res) => {}));
+    it('DELETE status:204 returns no content', () => request.delete('/api/articles/1/comments/2').expect(204));
   });
   describe('/users', () => {
     it('GET status:200 returns an array of user objects', () => request
@@ -436,5 +446,49 @@ describe('/api', () => {
           'comment_count',
         );
       }));
+    it('GET / status:200 return an array of length 10 - DEFAULT', () => request
+      .get('/api/users/icellusedkars/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).to.have.length(6);
+      }));
+    it('GET / status:200 return an array of length 10 - DEFAULT', () => request
+      .get('/api/users/icellusedkars/articles?limit=2')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).to.have.length(2);
+      }));
+    it('GET / status:200 to be sorted by date, descending - DEFAULT', () => request
+      .get('/api/users/icellusedkars/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles[0].created_at > body.articles[1].created_at).to.equal(true);
+        expect(body.articles[1].created_at > body.articles[2].created_at).to.equal(true);
+      }));
+    it('GET status:200 to be sorted by date, order=asc', () => request
+      .get('/api/users/butter_bridge/articles?order_by=asc')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles[0].created_at < body.articles[1].created_at).to.equal(true);
+      }));
+    it('GET status:200 should have pagination ability', () => request
+      .get('/api/users/butter_bridge/articles?p=1')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).to.have.length(3);
+      }));
+    it('GET status:404 page no articles on this page', () => request
+      .get('/api/users/butter_bridge/articles?p=5')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).to.equal('no articles found');
+      }));
+  });
+  describe('/api', () => {
+    it('GET status:200 returns json of endpoints', () => {
+      return request.get('/api').expect(200).then(({ body }) => {
+        expect(body).to.contain.keys('endpoints');
+      });
+    });
   });
 });

@@ -9,10 +9,9 @@ exports.fetchUserByUsername = username => connection
 
 exports.fetchArticlesByUser = (
   username,
-  limit = 10,
-  sort_by = 'created_at',
-  order_by = 'desc',
-  p = 1,
+  {
+    limit = 10, sort_by = 'created_at', order_by = 'desc', p = 1,
+  },
 ) => connection
   .select(
     'articles.username as author',

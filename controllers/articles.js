@@ -96,12 +96,13 @@ const patchCommentVote = (req, res, next) => {
 };
 
 const deleteCommentById = (req, res, next) => {
-  console.log(req.params);
   const { article_id } = req.params;
   const { comment_id } = req.params;
-  removeCommentByID(article_id, comment_id).then(response => console.log(response));
-  // res.status(204).send({ message: 'no content' }))
-  // .catch(next);
+  removeCommentByID(article_id, comment_id)
+    .then((response) => {
+      res.status(204).send({ message: 'comment deleted' });
+    })
+    .catch(next);
 };
 
 module.exports = {

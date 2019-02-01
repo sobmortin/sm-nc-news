@@ -22,8 +22,9 @@ const postTopics = (req, res, next) => {
 
 const getArticlesByTopic = (req, res, next) => {
   const topicParam = req.params.topic;
-  let queriesObject = req.query;
-  if (typeof +req.query.limit === 'string') queriesObject = { limit: 10 };
+  const queriesObject = req.query;
+  const limitValidCheck = /\d/g.test(queriesObject.limit);
+  if (!limitValidCheck) queriesObject.limit = 10;
   return Promise.all([
     fetchArticlesByTopic(topicParam, queriesObject),
     countArticlesByTopic(topicParam),
