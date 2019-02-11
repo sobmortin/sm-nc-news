@@ -11,10 +11,6 @@ exports.up = function (connection, Promise) {
     commentsTable.timestamp('created_at').defaultTo(connection.fn.now());
 
     commentsTable.text('body').notNullable();
-
-    // commentsTable.text("articles").references("articles.article_id");
-
-    // comments.article_id = articles.article_id
   });
 };
 

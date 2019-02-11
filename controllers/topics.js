@@ -39,8 +39,9 @@ const getArticlesByTopic = (req, res, next) => {
 };
 
 const postArticleByTopic = (req, res, next) => {
-  addArticleByTopic(req.body)
-    .then((article) => {
+  const newArticle = { ...req.params, ...req.body };
+  addArticleByTopic(newArticle)
+    .then(([article]) => {
       res.status(201).send({ article });
     })
     .catch(next);

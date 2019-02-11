@@ -15,3 +15,11 @@ exports.handle400 = (err, req, res, next) => {
   if (codes.hasOwnProperty(code)) res.status(400).send({ message: codes[code] });
   else next(err);
 };
+
+exports.handle405 = (err, req, res, next) => {
+  res.status(405).send({ message: 'invalid http method' });
+};
+
+exports.handle500 = (err, req, res, next) => {
+  res.status(500).send({ message: 'you muppet' });
+};

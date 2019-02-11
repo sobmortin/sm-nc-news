@@ -3,6 +3,7 @@ const {
   fetchUserByUsername,
   fetchArticlesByUser,
   countArticlesByUser,
+  addUser,
 } = require('../db/models/users');
 
 const getUsers = (req, res, next) => fetchUsers()
@@ -33,4 +34,17 @@ const getArticlesByUser = (req, res, next) => {
     .catch(next);
 };
 
-module.exports = { getUsers, getUserByUsername, getArticlesByUser };
+const postUser = (req, res, next) => {
+  addUser(req.body)
+    .then(([user_added]) => {
+      res.status(201).send({ user_added });
+    })
+    .catch(next);
+};
+
+module.exports = {
+  getUsers,
+  getUserByUsername,
+  getArticlesByUser,
+  postUser,
+};

@@ -161,10 +161,9 @@ GET /api/articles/:article_id
 PATCH /api/articles/:article_id
 ```
 
-
-  - `newVote` will indicate how much the `votes` property in the database should be updated by
-    E.g `{ inc_votes : 1 }` would increment the current article's vote property by 1
-    `{ inc_votes : -100 }` would decrement the current article's vote property by 100
+- `newVote` will indicate how much the `votes` property in the database should be updated by
+  E.g `{ inc_votes : 1 }` would increment the current article's vote property by 1
+  `{ inc_votes : -100 }` would decrement the current article's vote property by 100
 
 - this end-point should respond with the article you have just updated
 

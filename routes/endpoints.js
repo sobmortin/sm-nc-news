@@ -1,8 +1,9 @@
 exports.endpoints = {
   'GET api/topics': 'returns all topics',
-  'GET api/:topic/articles': 'returns articles by topic',
+  'GET api/topics/:topic/articles': 'returns articles by topic',
   'GET api/articles': 'returns all articles',
-  'GET api/:article_id/comments': 'returns all comments by article_id',
+  'GET api/articles/article_id': 'returns article by id',
+  'GET api//articles/:article_id/comments': 'returns all comments by article_id',
   'GET api/articles/:article_id/comments/:comment_id':
 		'returns comment by comment_id and corresponding article_id',
   'GET api/users': 'returns all users',

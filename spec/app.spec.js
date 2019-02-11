@@ -23,6 +23,12 @@ describe('/api', () => {
         expect(body.topics[0]).to.have.all.keys('slug', 'description');
       }));
     it('GET /topic should return a 404 status due to incorrect url spelling', () => request.get('/api/topic').expect(404));
+    xit('PATCH /topic returns 405 invalid method', () => request
+      .patch('/api/topics')
+      .expect(405)
+      .then((res) => {
+        console.log(res.error);
+      }));
     it('POST /topic should return 201 status and post the body', () => {
       const topic = { description: 'what an album', slug: 'hejira' };
       return request
@@ -55,11 +61,18 @@ describe('/api', () => {
           expect(body.message).to.equal('breaking unique limitations');
         });
     });
-    it('GET /:topic/articles should return articles that match topic query - mitch', () => request
+    it('GET /:topic/articles should return array of articles that match topic query - mitch', () => request
       .get('/api/topics/mitch/articles')
       .expect(200)
       .then(({ body }) => {
         expect(body.articles[0].topic).to.equal('mitch');
+        expect(body.articles[0]).to.contain.keys('topic', 'article_id', 'title', 'author');
+      }));
+    it('GET /:topic/articles should return object with key of num of total articles', () => request
+      .get('/api/topics/mitch/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.total_articles).to.equal('11');
       }));
     it('GET /:topic/articles should return articles that match topic query - cats', () => request
       .get('/api/topics/cats/articles')
@@ -176,7 +189,7 @@ describe('/api', () => {
         .send(article)
         .expect(201)
         .then(({ body }) => {
-          expect(body.article[0]).to.contain.keys(
+          expect(body.article).to.contain.keys(
             'article_id',
             'title',
             'body',
@@ -185,7 +198,7 @@ describe('/api', () => {
             'username',
             'created_at',
           );
-          expect(body.article).to.be.an('array');
+          expect(body.article).to.be.an('object');
         });
     });
     it('POST /::topic/articles 400 Bad Request status', () => {
@@ -199,6 +212,14 @@ describe('/api', () => {
           expect(message).to.equal('key is not present in table');
         });
     });
+    xit('Patch /::topic/articles 405 method not available', () => request
+      .patch('/api/topics/mitch/articles')
+      .expect(405)
+      .then((text) => {
+        console.log(text);
+        // const { message } = JSON.parse(text);
+        // expect(message).to.equal('key is not present in table');
+      }));
   });
   describe('/articles', () => {
     it('GET / status:200 return an object with articles array of topic objects', () => request
@@ -483,12 +504,29 @@ describe('/api', () => {
       .then(({ body }) => {
         expect(body.message).to.equal('no articles found');
       }));
+    it('POST status:201 adds user and returns user object', () => request
+      .post('/api/users')
+      .send({ username: 'bobby wobby', avatar_url: 'www.bobbywobby.com', name: 'Mr wobbly bob' })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.user_added).to.be.an('object');
+        expect(body.user_added).to.contain.keys('username', 'name', 'avatar_url');
+      }));
+    it('POST status:400 Bad Request', () => request
+      .post('/api/users')
+      .send({ something: 'bobby wobby', that: 'www.bobbywobby.com', shouldnt: 'Mr wobbly bob' })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).to.equal('bad syntax in post request');
+      }));
   });
   describe('/api', () => {
-    it('GET status:200 returns json of endpoints', () => {
-      return request.get('/api').expect(200).then(({ body }) => {
+    it('GET status:200 returns json of endpoints', () => request
+      .get('/api')
+      .expect(200)
+      .then(({ body }) => {
         expect(body).to.contain.keys('endpoints');
-      });
-    });
+      }));
+    it('POST / returns 405 error', () => request.post('/api').expect(405));
   });
 });

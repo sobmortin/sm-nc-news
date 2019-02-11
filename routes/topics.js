@@ -5,6 +5,7 @@ const {
   getArticlesByTopic,
   postArticleByTopic,
 } = require('../controllers/topics');
+const { handle405 } = require('../errors');
 
 topicsRouter
   .route('/')
@@ -14,6 +15,7 @@ topicsRouter
 topicsRouter
   .route('/:topic/articles')
   .get(getArticlesByTopic)
-  .post(postArticleByTopic);
+  .post(postArticleByTopic)
+
 
 module.exports = topicsRouter;
