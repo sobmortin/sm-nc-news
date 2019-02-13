@@ -16,7 +16,7 @@ exports.handle400 = (err, req, res, next) => {
   else next(err);
 };
 
-exports.handle405 = (err, req, res, next) => {
+exports.handle405 = (req, res, next) => {
   res.status(405).send({ message: 'invalid http method' });
 };
 

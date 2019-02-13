@@ -23,12 +23,7 @@ describe('/api', () => {
         expect(body.topics[0]).to.have.all.keys('slug', 'description');
       }));
     it('GET /topic should return a 404 status due to incorrect url spelling', () => request.get('/api/topic').expect(404));
-    xit('PATCH /topic returns 405 invalid method', () => request
-      .patch('/api/topics')
-      .expect(405)
-      .then((res) => {
-        console.log(res.error);
-      }));
+    it('PATCH /topic returns 405 invalid method', () => request.patch('/api/topics').expect(405));
     it('POST /topic should return 201 status and post the body', () => {
       const topic = { description: 'what an album', slug: 'hejira' };
       return request
@@ -212,14 +207,7 @@ describe('/api', () => {
           expect(message).to.equal('key is not present in table');
         });
     });
-    xit('Patch /::topic/articles 405 method not available', () => request
-      .patch('/api/topics/mitch/articles')
-      .expect(405)
-      .then((text) => {
-        console.log(text);
-        // const { message } = JSON.parse(text);
-        // expect(message).to.equal('key is not present in table');
-      }));
+    it('Patch /::topic/articles 405 method not available', () => request.patch('/api/topics/mitch/articles').expect(405));
   });
   describe('/articles', () => {
     it('GET / status:200 return an object with articles array of topic objects', () => request
@@ -527,6 +515,6 @@ describe('/api', () => {
       .then(({ body }) => {
         expect(body).to.contain.keys('endpoints');
       }));
-    it('POST / returns 405 error', () => request.post('/api').expect(405));
+    it('POST / returns 405 error', () => request.delete('/api').expect(405));
   });
 });

@@ -1,4 +1,5 @@
 const articlesRouter = require('express').Router();
+const { handle405 } = require('../errors/index');
 const {
   getArticles,
   getArticleByID,
@@ -10,22 +11,28 @@ const {
   deleteCommentById,
 } = require('../controllers/articles');
 
-articlesRouter.route('/').get(getArticles);
+articlesRouter
+  .route('/')
+  .get(getArticles)
+  .all(handle405);
 
 articlesRouter
   .route('/:article_id')
   .get(getArticleByID)
   .patch(patchArticleByID)
-  .delete(deleteArticleByID);
+  .delete(deleteArticleByID)
+  .all(handle405);
 
 articlesRouter
   .route('/:article_id/comments')
   .get(getCommentByArticleID)
-  .post(postCommentToArticleID);
+  .post(postCommentToArticleID)
+  .all(handle405);
 
 articlesRouter
   .route('/:article_id/comments/:comment_id')
   .patch(patchCommentVote)
-  .delete(deleteCommentById);
+  .delete(deleteCommentById)
+  .all(handle405);
 
 module.exports = articlesRouter;
