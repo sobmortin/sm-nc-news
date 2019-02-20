@@ -67,7 +67,8 @@ const getCommentByArticleID = (req, res, next) => {
 };
 
 const postCommentToArticleID = (req, res, next) => {
-  addCommentToArticleID(req.body)
+  const { article_id } = req.params;
+  addCommentToArticleID({ ...req.body, article_id })
     .then(([comment]) => {
       res.status(201).send({ comment });
     })

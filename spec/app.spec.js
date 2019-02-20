@@ -362,7 +362,7 @@ describe('/api', () => {
       .then(({ body }) => {
         expect(body.comments).to.have.length(5);
       }));
-    it('POST status:201 returns added comment object', () => {
+    it.only('POST status:201 returns added comment object', () => {
       const comment = { username: 'rogersop', body: 'wow, just amazing, just awful' };
       return request
         .post('/api/articles/1/comments')
@@ -376,6 +376,7 @@ describe('/api', () => {
             'created_at',
             'username',
             'body',
+            'article_id',
           );
         });
     });

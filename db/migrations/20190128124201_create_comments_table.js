@@ -4,7 +4,10 @@ exports.up = function (connection, Promise) {
 
     commentsTable.string('username').references('users.username');
 
-    commentsTable.integer('article_id').references('articles.article_id');
+    commentsTable
+      .integer('article_id')
+      .references('articles.article_id')
+      .notNullable();
 
     commentsTable.integer('votes').defaultTo(0);
 
