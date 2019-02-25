@@ -3,7 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const apiRouter = require('./routes/api');
 const {
-  handle404, handle400, handle500, handle405,
+  handle404, handle400, handle500,
 } = require('./errors');
 
 const app = express();
