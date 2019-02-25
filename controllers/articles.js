@@ -77,8 +77,7 @@ const postCommentToArticleID = (req, res, next) => {
 
 const patchCommentVote = (req, res, next) => {
   const { inc_votes } = req.body;
-  const { comment_id } = req.params;
-  const { article_id } = req.params;
+  const { article_id, comment_id } = req.params;
   if (+inc_votes > 0) {
     return voteUpCommentByID(+comment_id, +article_id)
       .then(([votedComment]) => {
@@ -97,12 +96,9 @@ const patchCommentVote = (req, res, next) => {
 };
 
 const deleteCommentById = (req, res, next) => {
-  const { article_id } = req.params;
   const { comment_id } = req.params;
-  removeCommentByID(article_id, comment_id)
-    .then((response) => {
-      res.status(204).send({ message: 'comment deleted' });
-    })
+  removeCommentByID(comment_id)
+    .then(delete_count => (delete_count ? res.status(204).send({}) : Promise.reject()))
     .catch(next);
 };
 

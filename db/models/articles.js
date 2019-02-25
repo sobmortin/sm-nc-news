@@ -114,11 +114,11 @@ exports.voteDownCommentByID = (commentID, articleID) => connection('comments')
     }
   });
 
-exports.removeCommentByID = (commentID, articleID) => connection('comments')
+exports.removeCommentByID = commentID => connection('comments')
   .where('comments.comment_id', '=', commentID)
-  .andWhere('comments.article_id', articleID)
-  .del()
-  .returning('*');
+  // .andWhere('comments.article_id', articleID)
+  .del();
+// .returning('*');
 
 // exports.removeArticleByID = articleID => connection('comments')
 //   .del()
