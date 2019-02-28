@@ -2,7 +2,7 @@
 
 # Project Title
 
-This is the back-end API for my Northcoders News project. 
+This is the back-end API for my Northcoders News project.
 
 Link to the Front-End : https://github.com/sobmortin/SM-NC-NEWS-FE
 
@@ -12,33 +12,34 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-This project requires PostgreSQL
+PostgreSQL
+Node.js
 
 ### Installing
 
 A step by step series of examples that tell you how to get a development env running
 
-Say what the step will be
+run '\$ npm install' in the command line to install all the necessary dependencies:
 
-\$ npm i
+You will also need PostreSQL installed to access the database.
 
-$ npm run seed-db
-
-End with an example of getting some data out of the system or using it for a little demo
+The package.json file includes a list of other commands, including migrating, seeding rollingback the database.
 
 ## Running the tests
 
-run npm t
+To run tests, run '\$ npm test' from the command line.
 
-For testing I used supertest and chai to check the connection to the database was correct, CRUD requests functioned as expected, and error handling was robust and gave clear instructions to the user.
+The testing is built with Supertest, Mocha and Chai
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+A link to the deployed version can be found here:
 
-## Built With
+https://the-nc-news.herokuapp.com/api
 
-- [Postgres](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
+Link to Front-end Repository:
+
+https://github.com/sobmortin/SM-NC-NEWS-FE
 
 ## Authors
 
